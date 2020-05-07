@@ -75,5 +75,6 @@ function filterExtPR(q, cursor, filtered, res) {
 
 module.exports = (req, res) => {
   //res.json({hello:"world"})
-  filterExtPR(q, null, [], res);
+  
+  filterExtPR(req.query.q || q, null, [], res);
 };
