@@ -56,22 +56,24 @@ function filterExtPR(q, cursor, filtered, res) {
     .then((response) => {
       console.log("cursor: %s, issueCount: %s", response.search.pageInfo.endCursor, response.search.issueCount);
       response.search.nodes.forEach((pr) => {
-        if (pr.author.organizations == null || pr.author.organizations.nodes.every((org) => org.id != pr.repository.owner.id)){
-          filtered.push(pr);    
+        if (pr.author.organizations == null || pr.author.organizations.nodes.every((org) => org.id != pr.repository.owner.id)) {
+          if (pr.author.login != "dependabot") {
+            filtered.push(pr);
+          }
         }
       });
       if (response.search.pageInfo.hasNextPage) {
         filterExtPR(q, response.search.pageInfo.endCursor, filtered, res);
       } else {
         console.log("the end");
-        res.json(filtered)
+        res.json(filtered);
       }
       //console.log("response:", response.search.nodes);
     })
     .catch((e) => console.log(e));
 }
 
-module.exports = (req,res ) => {
-  //res.json({hello:"world"})  
-  filterExtPR(q,null,[], res);
-}
+module.exports = (req, res) => {
+  //res.json({hello:"world"})
+  filterExtPR(q, null, [], res);
+};
