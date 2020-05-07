@@ -1,0 +1,1 @@
+Simple serverless function that filters out pull requests from external contributors (not members of repository organiztion).
