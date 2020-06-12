@@ -3,7 +3,7 @@
  * @param {import('probot').Application} app
  */
 const { graphql } = require("@octokit/graphql");
-const q = "is:open is:pr review:none org:kyma-project org:kyma-incubator archived:false";
+const q = "is:open is:pr org:kyma-project org:kyma-incubator archived:false";
 const extPRquery = `query listPR($q: String!, $cursor: String)
 {
      search(type: ISSUE, query: $q, first: 100, after: $cursor) {
@@ -56,7 +56,7 @@ function filterExtPR(q, cursor, filtered, res) {
     .then((response) => {
       console.log("cursor: %s, issueCount: %s", response.search.pageInfo.endCursor, response.search.issueCount);
       response.search.nodes.forEach((pr) => {
-        if (pr.author.organizations == null || pr.author.organizations.nodes.every((org) => org.id != pr.repository.owner.id)) {
+        if (!pr.author.organizations || pr.author.organizations.nodes.every((org) => org.id != pr.repository.owner.id)) {
           if (pr.author.login != "dependabot") {
             filtered.push(pr);
           }
@@ -74,7 +74,6 @@ function filterExtPR(q, cursor, filtered, res) {
 }
 
 module.exports = (req, res) => {
-  //res.json({hello:"world"})
-  
   filterExtPR(req.query.q || q, null, [], res);
 };
+
